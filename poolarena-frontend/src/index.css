@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PoolArena Gaming Design System - Dark Mode First */
+
+@layer base {
+  :root {
+    /* Gaming Dark Theme */
+    --background: 225 25% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 225 20% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 225 20% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Electric Blue Gaming Accent */
+    --primary: 186 100% 50%;
+    --primary-foreground: 225 25% 4%;
+
+    --secondary: 225 15% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 225 15% 10%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 186 100% 50%;
+    --accent-foreground: 225 25% 4%;
+
+    /* Gaming Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 225 25% 4%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 225 15% 15%;
+    --input: 225 15% 12%;
+    --ring: 186 100% 50%;
+
+    /* Gaming Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(186 100% 50%), hsl(186 100% 40%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 26%));
+    --gradient-card: linear-gradient(135deg, hsl(225 20% 6%), hsl(225 15% 8%));
+
+    /* Gaming Shadows */
+    --shadow-glow: 0 0 20px hsl(186 100% 50% / 0.3);
+    --shadow-card: 0 8px 32px hsl(225 25% 4% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Gaming Utilities */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .card-gaming {
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+  
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-rank-bounce {
+    animation: rank-bounce 0.3s ease-in-out;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
