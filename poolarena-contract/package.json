@@ -1,17 +1,5 @@
 {
-  "name": "poolarena-contract",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.16.1",
-  "dependencies": {
-    "@fhenixprotocol/cofhe-contracts": "^0.0.13",
-    "@pythnetwork/pyth-sdk-solidity": "^4.2.0"
-  }
+	"dependencies": {
+		"@pythnetwork/pyth-sdk-solidity": "^4.2.0"
+	}
 }
