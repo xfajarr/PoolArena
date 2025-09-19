@@ -43,9 +43,8 @@ PoolArena/
 │   ├── test/                    # Test suites
 │   ├── script/                  # Deployment scripts
 │   └── lib/                     # Dependencies
-├── demo-ui/                     # Frontend demo (HTML/CSS/JS)
+├── poolarena-frontend/          # Frontend (React Vite)
 ├── README.md                    # This file
-└── DEPLOYMENT.md                # Deployment guide
 ```
 
 ## 🚀 Getting Started
