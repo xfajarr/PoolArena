@@ -1,0 +1,319 @@
+# PoolArena - Deployment and Usage Guide
+
+A decentralized tournament platform for Uniswap V4 liquidity providers to compete based on fee generation.
+
+## 🎯 Overview
+
+PoolArena allows LP providers to participate in tournaments where they compete based on the fees their liquidity positions generate. The platform uses Uniswap V4 hooks to track real-time fee generation and automatically distributes prizes to top performers.
+
+### Key Features
+
+- **Tournament-based Competition**: Users stake LP NFTs and compete for prizes
+- **Real-time Fee Tracking**: Uniswap V4 hooks track fee generation during tournaments
+- **Automatic Prize Distribution**: Top 3 performers receive ETH prizes
+- **Multiple Tournament Types**: Daily and Weekly tournaments
+- **Minimum 2 Participants**: Flexible tournament sizes from 2-12 participants
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+1. **Foundry**: Install from [getfoundry.sh](https://getfoundry.sh/)
+2. **Node.js** (optional): For additional tooling
+3. **Private Key**: For deployment and interactions
+4. **Testnet ETH**: For Unichain Sepolia deployment
+
+### Option 1: Using Scripts (Recommended)
+
+#### Windows (PowerShell)
+```powershell
+# Setup environment
+.\deploy-and-interact.ps1 -Action setup
+
+# Deploy to Unichain Sepolia
+.\deploy-and-interact.ps1 -Action deploy -Network unichain-sepolia
+
+# Run interaction demo
+.\deploy-and-interact.ps1 -Action interact
+
+# Run tests
+.\deploy-and-interact.ps1 -Action test
+```
+
+#### Linux/Mac (Bash)
+```bash
+# Make script executable
+chmod +x deploy-and-interact.sh
+
+# Setup environment
+./deploy-and-interact.sh setup
+
+# Deploy to Unichain Sepolia
+./deploy-and-interact.sh deploy unichain-sepolia
+
+# Run interaction demo
+./deploy-and-interact.sh interact
+
+# Run tests
+./deploy-and-interact.sh test
+```
+
+### Option 2: Manual Deployment
+
+1. **Setup Environment**
+```bash
+# Install dependencies
+forge install
+
+# Build contracts
+forge build
+
+# Create .env file
+cp .env.example .env
+# Edit .env with your private key and RPC URLs
+```
+
+2. **Deploy Contracts**
+```bash
+# Deploy to Unichain Sepolia
+forge script script/DeployPoolArena.s.sol:DeployPoolArena \
+    --rpc-url https://sepolia.unichain.org \
+    --broadcast \
+    --verify
+```
+
+3. **Run Interaction Demo**
+```bash
+# Load deployment addresses into environment
+source deployment-addresses.env
+
+# Run interaction script
+forge script script/InteractWithPoolArena.s.sol:InteractWithPoolArena \
+    --rpc-url https://sepolia.unichain.org \
+    --broadcast
+```
+
+## 📋 Configuration
+
+### Environment Variables
+
+Create a `.env` file with the following:
+
+```env
+# Deployment private key (DO NOT commit to git!)
+PRIVATE_KEY=0x1234567890123456789012345678901234567890123456789012345678901234
+
+# Network RPC URLs
+UNICHAIN_SEPOLIA_RPC=https://sepolia.unichain.org
+LOCALHOST_RPC=http://localhost:8545
+
+# Block explorer API keys (optional)
+ETHERSCAN_API_KEY=your_api_key_here
+
+# Test user private keys (for demo script)
+USER1_PRIVATE_KEY_OR_DEFAULT=1001
+USER2_PRIVATE_KEY_OR_DEFAULT=1002
+USER3_PRIVATE_KEY_OR_DEFAULT=1003
+```
+
+### Network Configuration
+
+| Network | RPC URL | Explorer | Chain ID |
+|---------|---------|----------|----------|
+| Unichain Sepolia | https://sepolia.unichain.org | https://unichain-sepolia.blockscout.com | 1301 |
+| Localhost | http://localhost:8545 | N/A | 31337 |
+
+## 🏗️ Contract Architecture
+
+### Core Contracts
+
+1. **PoolArena.sol** - Main tournament contract
+   - Tournament creation and management
+   - User registration and prize distribution
+   - Integration with position manager and oracles
+
+2. **PoolArenaHook.sol** - Uniswap V4 hook
+   - Tracks liquidity modifications during tournaments
+   - Records swap fees in real-time
+   - Prevents position modifications during active tournaments
+
+### Contract Addresses (After Deployment)
+
+Deployment addresses will be saved to `deployment-addresses.env`:
+
+```
+POOL_ARENA=0x...
+POOL_ARENA_HOOK=0x...
+POSITION_MANAGER=0x...
+PYTH_ORACLE=0x...
+POOL_MANAGER=0x...
+DEPLOYER=0x...
+```
+
+## 🎮 How to Use PoolArena
+
+### 1. Admin Creates Tournament
+
+```solidity
+// Only contract owner can create tournaments
+poolArena.createTournament(
+    PoolArena.TournamentType.DAILY,  // Tournament type
+    0.01 ether,                      // Entry fee
+    5                                // Max participants
+);
+```
+
+### 2. Users Join Tournament
+
+```solidity
+// User must:
+// 1. Own an LP NFT from Uniswap V4
+// 2. Approve the NFT transfer
+// 3. Pay the entry fee
+
+positionManager.approve(address(poolArena), tokenId);
+poolArena.joinTournament{value: 0.01 ether}(tournamentId, tokenId);
+```
+
+### 3. Tournament Auto-starts
+
+- Tournament automatically starts when max participants joined
+- Admin can manually start with minimum participants (2+)
+- LP positions are locked during the tournament
+
+### 4. Fee Generation Tracking
+
+- Uniswap V4 hooks track swap fees generated by each participant's LP position
+- Real-time fee accumulation determines rankings
+- Position modifications are prevented during active tournaments
+
+### 5. Tournament Completion
+
+```solidity
+// After tournament duration ends, anyone can finish it
+poolArena.finishTournament(tournamentId);
+```
+
+- Winners determined by total fees generated
+- Prizes distributed to top 3 performers:
+  - 1st place: 50% of prize pool
+  - 2nd place: 30% of prize pool  
+  - 3rd place: 20% of prize pool
+- LP NFTs returned to participants
+
+## 🧪 Testing
+
+### Run All Tests
+```bash
+forge test -vv
+```
+
+### Run Specific Test
+```bash
+forge test --match-test testCreateTournament -vvv
+```
+
+### Test Coverage
+```bash
+forge coverage
+```
+
+## 📊 Contract Flow Diagram
+
+```
+1. Admin creates tournament
+   ↓
+2. Users join tournament (stake LP NFTs + pay entry fee)
+   ↓
+3. Tournament starts (auto or manual)
+   ↓
+4. LP positions locked, fee tracking begins
+   ↓
+5. Swap fees accumulate for each participant
+   ↓
+6. Tournament ends after duration
+   ↓
+7. Winners determined by fee generation
+   ↓
+8. Prizes distributed, NFTs returned
+```
+
+## 🔧 Advanced Usage
+
+### Custom Tournament Parameters
+
+```solidity
+// Create weekly tournament with higher stakes
+poolArena.createTournament(
+    PoolArena.TournamentType.WEEKLY,  // 7-day duration
+    0.1 ether,                        // Higher entry fee
+    8                                 // Larger tournament
+);
+```
+
+### Platform Fee Management
+
+```solidity
+// Owner can withdraw accumulated platform fees (1%)
+poolArena.withdrawPlatformFees();
+```
+
+### Emergency Functions
+
+```solidity
+// Cancel tournament and refund participants
+poolArena.cancelTournament(tournamentId);
+```
+
+## 🛠️ Development
+
+### Build and Deploy
+
+```bash
+# Build contracts
+forge build
+
+# Run tests
+forge test
+
+# Deploy with verification
+forge script script/DeployPoolArena.s.sol:DeployPoolArena \
+    --rpc-url $RPC_URL \
+    --broadcast \
+    --verify
+```
+
+### Local Development
+
+```bash
+# Start local node
+anvil
+
+# Deploy to local network
+./deploy-and-interact.sh deploy localhost
+
+# Run interaction demo locally
+./deploy-and-interact.sh interact
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Hook Address Validation Error**
+   - Ensure hook is deployed to address with correct permission bits
+   - Use HookMiner to find valid deployment address
+
+2. **Insufficient Gas**
+   - Hook deployment requires significant gas
+   - Increase gas limit for deployment transactions
+
+3. **Tournament Full Error**
+   - Check tournament participant count before joining
+   - Create new tournament if current one is full
+
+---
+
+**Happy Trading! 🚀**
+
+Built with ❤️ using Foundry, Uniswap V4, and Solidity.

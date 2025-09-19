@@ -93,7 +93,7 @@ contract PoolArena is IERC721Receiver, ReentrancyGuard, Ownable, IPoolArena {
         uint256 _entryFee,
         uint256 _maxParticipants
     ) external onlyOwner {
-        require(_maxParticipants >= 5 && _maxParticipants <= 12, "Invalid participant count");
+        require(_maxParticipants >= 2 && _maxParticipants <= 12, "Invalid participant count");
         require(_entryFee > 0, "Entry fee must be positive");
         
         Tournament storage tournament = tournaments[nextTournamentId];
@@ -144,7 +144,7 @@ contract PoolArena is IERC721Receiver, ReentrancyGuard, Ownable, IPoolArena {
     function startTournament(uint256 _tournamentId) external onlyOwner {
         Tournament storage tournament = tournaments[_tournamentId];
         require(tournament.status == TournamentStatus.PENDING, "Tournament not pending");
-        require(tournament.currentParticipants >= 5, "Need at least 5 participants");
+        require(tournament.currentParticipants >= 2, "Need at least 2 participants");
         
         _startTournament(_tournamentId);
     }
